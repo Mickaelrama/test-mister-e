@@ -1,0 +1,46 @@
+html,
+body {
+  cursor: none !important;
+}
+
+html *,
+body * {
+  cursor: none !important;
+}
+
+.custom-cursor {
+  pointer-events: none;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  background-color: rgb(0, 191, 201);
+  border-radius: 100px;
+  transform: translate(-50%, -50%);
+}
+
+.cursor {
+  @extend .custom-cursor;
+  z-index: 100000000;
+}
+
+.shadow-cursor {
+  @extend .custom-cursor;
+  z-index: 9999999;
+  opacity: 0.3;
+  display: none !important;
+}
+
+.show {
+  display: block !important;
+}
+
+.pointer {
+  background-color: rgb(182, 0, 12);
+}
+
+.text {
+  width: 2px;
+  height: 24px;
+}
