@@ -1,0 +1,18 @@
+.custom-cursor {
+  width: 10px;
+  height: 10px;
+  background-color: rgb(0, 255, 208);
+  position: absolute;
+  border-radius: 100px;
+}
+
+.cursor {
+  @extend .custom-cursor;
+  z-index: 100000000;
+}
+
+.shadow-cursor {
+  @extend .custom-cursor;
+  z-index: 9999999;
+  opacity: 0.3;
+}
