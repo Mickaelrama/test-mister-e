@@ -1,4 +1,15 @@
 @import "./fonts.scss";
+
+html,
+body {
+  cursor: none !important;
+}
+
+html *,
+body * {
+  cursor: none !important;
+}
+
 body {
   background-color: rgb(58, 58, 58);
   color: white;

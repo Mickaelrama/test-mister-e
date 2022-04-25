@@ -27,6 +27,29 @@ const CustomCursorProvider = ({ children }) => {
       setPos({ x: e.clientX, y: e.clientY });
     }
   };
+  const handleOnMouseEnter = () => {
+    setVisible(true);
+  };
+
+  const handleOnMouseLeave = () => {
+    setVisible(false);
+  };
+
+  const handleOnMouseUp = () => {
+    setIsActive(true);
+  };
+
+  const handleOnMouseDown = () => {
+    setIsActive(false);
+    setVisible(true);
+  };
+
+  const handleOnMouseOver = (e) => {
+    setCursorType(cursorTag[e.target.localName]);
+  };
+  const handleOnMouseOut = () => {
+    setCursorType("");
+  };
 
   // shadowCursor effect
   useEffect(() => {
@@ -50,33 +73,36 @@ const CustomCursorProvider = ({ children }) => {
 
   useEffect(() => {
     document.addEventListener("mousemove", handleOnMoveMouse);
-    document.addEventListener("mouseenter", () => {
-      setVisible(true);
-    });
-    document.addEventListener("mouseleave", () => {
-      setVisible(false);
-    });
-    document.addEventListener("mouseup", () => {
-      setIsActive(true);
-    });
-    document.addEventListener("mousedown", () => {
-      setIsActive(false);
-      setVisible(true);
-    });
+    document.addEventListener("mouseenter", handleOnMouseEnter);
+    document.addEventListener("mouseleave", handleOnMouseLeave);
+    document.addEventListener("mouseup", handleOnMouseUp);
+    document.addEventListener("mousedown", handleOnMouseDown);
 
     // cursor effect when it is over specified tag
     setTimeout(() => {
       document
         .querySelectorAll(Object.keys(cursorTag).join(","))
         .forEach((el) => {
-          el.addEventListener("mouseover", (e) => {
-            setCursorType(cursorTag[e.target.localName]);
-          });
-          el.addEventListener("mouseout", (e) => {
-            setCursorType("");
-          });
+          el.addEventListener("mouseover", handleOnMouseOver);
+          el.addEventListener("mouseout", handleOnMouseOut);
         });
     }, 100);
+    return () => {
+      // remove event listener
+      document.removeEventListener("mousemove", handleOnMoveMouse);
+      document.removeEventListener("mouseenter", handleOnMouseEnter);
+      document.removeEventListener("mouseleave", handleOnMouseLeave);
+      document.removeEventListener("mouseup", handleOnMouseUp);
+      document.removeEventListener("mousedown", handleOnMouseDown);
+      setTimeout(() => {
+        document
+          .querySelectorAll(Object.keys(cursorTag).join(","))
+          .forEach((el) => {
+            el.removeEventListener("mouseover", handleOnMouseOver);
+            el.removeEventListener("mouseout", handleOnMouseOut);
+          });
+      }, 100);
+    };
   }, [location.pathname]); // this effect run when page changes
 
   return (
