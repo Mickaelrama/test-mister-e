@@ -17,7 +17,7 @@ const CustomCursorProvider = ({ children }) => {
   const shadowCursor = useRef(null);
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [visible, setVisible] = useState(true);
-  const [isActive, setIsActive] = useState(true);
+  const [isActive, setIsActive] = useState(false);
   const [cursorType, setCursorType] = useState("");
 
   const handleOnMoveMouse = (e) => {
@@ -27,28 +27,33 @@ const CustomCursorProvider = ({ children }) => {
       setPos({ x: e.clientX, y: e.clientY });
     }
   };
-  const handleOnMouseEnter = () => {
+  const handleOnMouseOverInDocument = () => {
     setVisible(true);
   };
 
-  const handleOnMouseLeave = () => {
+  const handleOnMouseOutInDocument = () => {
     setVisible(false);
   };
 
   const handleOnMouseUp = () => {
-    setIsActive(true);
+    setIsActive(false);
   };
 
   const handleOnMouseDown = () => {
-    setIsActive(false);
+    setIsActive(true);
     setVisible(true);
   };
 
-  const handleOnMouseOver = (e) => {
+  const handleOnMouseOverSpecifiedTag = (e) => {
     setCursorType(cursorTag[e.target.localName]);
   };
-  const handleOnMouseOut = () => {
+  const handleOnMouseOutSpecifiedTag = () => {
     setCursorType("");
+  };
+
+  const handleOpenContextMenu = () => {
+    setIsActive(false);
+    setVisible(false);
   };
 
   // shadowCursor effect
@@ -57,10 +62,10 @@ const CustomCursorProvider = ({ children }) => {
       setTimeout(() => {
         shadowCursor.current.style.top = `${pos.y - 8}px`;
         shadowCursor.current.style.left = `${pos.x - 8}px`;
+        shadowCursor.current.style.transition = "0s";
       }, 100);
-      shadowCursor.current.style.transform = !isActive
-        ? "scale(2)"
-        : "scale(1)";
+      shadowCursor.current.style.transform = isActive ? "scale(3)" : "scale(1)";
+      shadowCursor.current.style.transition = "0.2s";
     }
   }, [pos, isActive]);
 
@@ -73,33 +78,35 @@ const CustomCursorProvider = ({ children }) => {
 
   useEffect(() => {
     document.addEventListener("mousemove", handleOnMoveMouse);
-    document.addEventListener("mouseenter", handleOnMouseEnter);
-    document.addEventListener("mouseleave", handleOnMouseLeave);
+    document.addEventListener("mouseover", handleOnMouseOverInDocument);
+    document.addEventListener("mouseout", handleOnMouseOutInDocument);
     document.addEventListener("mouseup", handleOnMouseUp);
     document.addEventListener("mousedown", handleOnMouseDown);
+    document.addEventListener("contextmenu", handleOpenContextMenu);
 
     // cursor effect when it is over specified tag
     setTimeout(() => {
       document
         .querySelectorAll(Object.keys(cursorTag).join(","))
         .forEach((el) => {
-          el.addEventListener("mouseover", handleOnMouseOver);
-          el.addEventListener("mouseout", handleOnMouseOut);
+          el.addEventListener("mouseover", handleOnMouseOverSpecifiedTag);
+          el.addEventListener("mouseout", handleOnMouseOutSpecifiedTag);
         });
     }, 100);
     return () => {
-      // remove event listener
+      // remove alls events listeners
       document.removeEventListener("mousemove", handleOnMoveMouse);
-      document.removeEventListener("mouseenter", handleOnMouseEnter);
-      document.removeEventListener("mouseleave", handleOnMouseLeave);
+      document.removeEventListener("mouseover", handleOnMouseOverInDocument);
+      document.removeEventListener("mouseout", handleOnMouseOutInDocument);
       document.removeEventListener("mouseup", handleOnMouseUp);
       document.removeEventListener("mousedown", handleOnMouseDown);
+      document.removeEventListener("contextmenu", handleOpenContextMenu);
       setTimeout(() => {
         document
           .querySelectorAll(Object.keys(cursorTag).join(","))
           .forEach((el) => {
-            el.removeEventListener("mouseover", handleOnMouseOver);
-            el.removeEventListener("mouseout", handleOnMouseOut);
+            el.removeEventListener("mouseover", handleOnMouseOverSpecifiedTag);
+            el.removeEventListener("mouseout", handleOnMouseOutSpecifiedTag);
           });
       }, 100);
     };
@@ -111,7 +118,7 @@ const CustomCursorProvider = ({ children }) => {
       <div
         ref={shadowCursor}
         className={cx("shadow-cursor", cursorType, {
-          show: cursorType === "" || cursorType === "pointer",
+          show: (cursorType === "" || cursorType === "pointer") && visible,
         })}
       />
       {children}
